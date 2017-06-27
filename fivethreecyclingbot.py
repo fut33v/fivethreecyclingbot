@@ -31,7 +31,7 @@ class FiveThreeCyclingBot(TelegramBot):
         TelegramBot.__init__(self, token, name)
 
     def _process_message(self, user_id, chat_id, text):
-        if text == '/start':
+        if text == '/start' or text == '/start@FiveThreeCyclingBot':
             response = """
 Присылаю новые посты по хештегу #53cycling
             """
