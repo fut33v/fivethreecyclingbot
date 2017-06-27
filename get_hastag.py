@@ -28,6 +28,7 @@ def build_message():
     response_json = json.loads(response_text)
     if 'response' not in response_json:
         print "No 'response' in response"
+        print response_json
         return None
     response = response_json['response']
     if 'items' not in response:
