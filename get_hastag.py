@@ -7,7 +7,6 @@ from broadcast import broadcast_message
 from util import bot_util
 import time
 
-_HASH_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'hash'
 _TOKEN_VK_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'token_vk'
 _TOKEN_VK = bot_util.read_one_string_file(_TOKEN_VK_FILENAME)
 _LAST_ITEM_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'last_item'
@@ -15,15 +14,20 @@ _LAST_ITEM_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'last_item'
 _NEWSFEED_SEARCH_URL = "https://api.vk.com/method/newsfeed.search?q=%2353cycling&rev=1&v=5.63&access_token={t}".format(
     t=_TOKEN_VK)
 
-print _NEWSFEED_SEARCH_URL
+_HASHTAGS = ["53cycling", "novgorodbike"]
+
+def get_newsfeed_search_hashtag_url(hashtag):
+    return "https://api.vk.com/method/newsfeed.search?q=%23{h}&rev=1&v=5.63&access_token={t}".format(
+        t=_TOKEN_VK, h=hashtag)
 
 
 def build_wall_url(owner_id, post_id):
     return "https://vk.com/wall{o}_{i}".format(o=owner_id, i=post_id)
 
 
-def build_message():
-    response_text = bot_util.urlopen(_NEWSFEED_SEARCH_URL)
+def build_message(hashtag):
+    url = get_newsfeed_search_hashtag_url(hashtag)
+    response_text = bot_util.urlopen(url)
     if not response_text:
         print "Failed to get data from VK"
         return None
@@ -45,9 +49,10 @@ def build_message():
         print "No 'owner_id' and 'id' in item"
         return None
     last_item_url = build_wall_url(last_item['owner_id'], last_item['id'])
-    last_item_in_file = bot_util.read_one_string_file(_LAST_ITEM_FILENAME)
+    last_item_filename = _LAST_ITEM_FILENAME + "_" + hashtag
+    last_item_in_file = bot_util.read_one_string_file(last_item_filename)
     if not last_item_in_file or last_item_url != last_item_in_file:
-        bot_util.write_one_string_file(_LAST_ITEM_FILENAME, last_item_url)
+        bot_util.write_one_string_file(last_item_filename, last_item_url)
         print "New post: " + last_item_url
         print last_item
         message = ""
@@ -60,8 +65,9 @@ def build_message():
                     if 'photo_1280' in photo:
                         photo_url = photo['photo_1280']
                     break
-            print photo_url
-            message += photo_url + "\n\n"
+            if photo_url:
+                print photo_url
+                message += photo_url + "\n\n"
         owner_id = last_item['owner_id']
         if 'text' in last_item:
             text = last_item['text']
@@ -73,13 +79,14 @@ def build_message():
             message += u"Автор: https://vk.com/club" + str(owner_id)
         return message
     else:
-        print "There is no new posts"
+        print "There is no new posts for #" + hashtag
     return None
 
 
 if __name__ == "__main__":
     while True:
-        message = build_message()
-        broadcast_message(message)
+        for h in _HASHTAGS:
+            m = build_message(h)
+            broadcast_message(m)
         time.sleep(30)
         print "tick"
