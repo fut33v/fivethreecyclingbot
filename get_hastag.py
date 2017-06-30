@@ -15,6 +15,8 @@ _LAST_ITEM_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'last_item'
 _NEWSFEED_SEARCH_URL = "https://api.vk.com/method/newsfeed.search?q=%2353cycling&rev=1&v=5.63&access_token={t}".format(
     t=_TOKEN_VK)
 
+print _NEWSFEED_SEARCH_URL
+
 
 def build_wall_url(owner_id, post_id):
     return "https://vk.com/wall{o}_{i}".format(o=owner_id, i=post_id)
@@ -47,7 +49,29 @@ def build_message():
     if not last_item_in_file or last_item_url != last_item_in_file:
         bot_util.write_one_string_file(_LAST_ITEM_FILENAME, last_item_url)
         print "New post: " + last_item_url
-        return last_item_url
+        print last_item
+        message = ""
+        if 'attachments' in last_item:
+            attachments = last_item['attachments']
+            photo_url = None
+            for attachment in attachments:
+                if 'photo' in attachment:
+                    photo = attachment['photo']
+                    if 'photo_1280' in photo:
+                        photo_url = photo['photo_1280']
+                    break
+            print photo_url
+            message += photo_url + "\n\n"
+        owner_id = last_item['owner_id']
+        if 'text' in last_item:
+            text = last_item['text']
+            message += text + "\n\n"
+        message += u"Пост: " + last_item_url + "\n"
+        if owner_id > 0:
+            message += u"Автор: https://vk.com/id" + str(owner_id)
+        else:
+            message += u"Автор: https://vk.com/club" + str(owner_id)
+        return message
     else:
         print "There is no new posts"
     return None
