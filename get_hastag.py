@@ -10,6 +10,7 @@ import time
 _TOKEN_VK_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'token_vk'
 _TOKEN_VK = bot_util.read_one_string_file(_TOKEN_VK_FILENAME)
 _LAST_ITEM_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'last_item'
+_ALL_POSTS_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'posts'
 
 _NEWSFEED_SEARCH_URL = "https://api.vk.com/method/newsfeed.search?q=%2353cycling&rev=1&v=5.63&access_token={t}".format(
     t=_TOKEN_VK)
@@ -72,11 +73,15 @@ def build_message(hashtag):
         if 'text' in last_item:
             text = last_item['text']
             message += text + "\n\n"
+        if not bot_util.check_file_for_string(_ALL_POSTS_FILENAME, last_item_url + "\n"):
+            return None
+        else:
+            bot_util.append_string_to_file(_ALL_POSTS_FILENAME, last_item_url + "\n")
         message += u"Пост: " + last_item_url + "\n"
         if owner_id > 0:
             message += u"Автор: https://vk.com/id" + str(owner_id)
         else:
-            message += u"Автор: https://vk.com/club" + str(owner_id)
+            message += u"Автор: https://vk.com/club" + str(-owner_id)
         return message
     else:
         print "There is no new posts for #" + hashtag
