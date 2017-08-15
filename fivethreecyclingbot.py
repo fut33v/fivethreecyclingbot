@@ -9,7 +9,6 @@ __author__ = 'fut33v'
 
 DATA_DIRNAME = "data/"
 TOKEN_FILENAME = DATA_DIRNAME + "token"
-ALBUMS_FILENAME = DATA_DIRNAME + 'albums'
 ADMIN_FILENAME = DATA_DIRNAME + 'admin'
 
 admins = None
@@ -21,9 +20,6 @@ if os.path.exists(ADMIN_FILENAME):
             for line in lines:
                 admins.append(line[:-1])
             admins = set(admins)
-
-
-REGEXP_ALBUM = re.compile("http[s]?://vk.com/album(-?\d*_\d*)")
 
 
 class FiveThreeCyclingBot(TelegramBot):
@@ -41,6 +37,7 @@ class FiveThreeCyclingBot(TelegramBot):
             success = self.send_response(chat_id, response=response)
             return success
         return False
+
 
 if __name__ == "__main__":
     t = bot_util.read_one_string_file(TOKEN_FILENAME)
