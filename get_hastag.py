@@ -34,8 +34,37 @@ def build_wall_url(owner_id, post_id):
     return "https://vk.com/wall{o}_{i}".format(o=owner_id, i=post_id)
 
 
-def build_message(hashtag):
-    url = get_newsfeed_search_hashtag_url(hashtag)
+def build_users_get_url(_user_id):
+    return "https://api.vk.com/method/users.get?user_ids={u}&fields=city&v=5.63".format(u=_user_id)
+
+
+def get_user_info(_user_id):
+    u = build_users_get_url(_user_id)
+    response_text = bot_util.urlopen(u)
+    if response_text:
+        response_json = json.loads(response_text)
+        if 'response' in response_json:
+            response = response_json['response']
+            if len(response) == 0:
+                return None
+            _user_info = response[0]
+            first_name = ""
+            last_name = ""
+            city = ""
+            if "first_name" in _user_info:
+                first_name = _user_info["first_name"]
+            if "last_name" in _user_info:
+                last_name = _user_info["last_name"]
+            if "city" in _user_info:
+                if "title" in _user_info["city"]:
+                    city = _user_info["city"]["title"]
+            _user_info = {'first_name': first_name, 'last_name': last_name, 'city': city}
+            return _user_info
+    return None
+
+
+def build_message(_hashtag):
+    url = get_newsfeed_search_hashtag_url(_hashtag)
     response_text = bot_util.urlopen(url)
     if not response_text:
         print "Failed to get data from VK"
@@ -58,7 +87,7 @@ def build_message(hashtag):
         print "No 'owner_id' and 'id' in item"
         return None
     last_item_url = build_wall_url(last_item['owner_id'], last_item['id'])
-    last_item_filename = _LAST_ITEM_FILENAME + "_" + hashtag
+    last_item_filename = _LAST_ITEM_FILENAME + "_" + _hashtag
     last_item_in_file = bot_util.read_one_string_file(last_item_filename)
     if not last_item_in_file or last_item_url != last_item_in_file:
         bot_util.write_one_string_file(last_item_filename, last_item_url)
@@ -92,7 +121,7 @@ def build_message(hashtag):
             message += u"Автор: https://vk.com/club" + str(-owner_id)
         return message
     else:
-        print "There is no new posts for #" + hashtag
+        print "There is no new posts for #" + _hashtag
     return None
 
 
@@ -151,11 +180,15 @@ def build_message_cycling_wall():
             return None
         else:
             bot_util.append_string_to_file(_ALL_POSTS_FILENAME, last_item_url + "\n")
-        message += u"Пост: " + last_item_url + "\n"
+        message += u"<b>Пост:</b> " + last_item_url + "\n"
         if owner_id > 0:
-            message += u"Автор: https://vk.com/id" + str(owner_id)
+            user_info = get_user_info(owner_id)
+            first_name = user_info['first_name']
+            last_name = user_info['last_name']
+            message += u"<b>Автор:</b> <a href=\"https://vk.com/id" + str(
+                owner_id) + u"\">" + first_name + u" " + last_name + u"</a>"
         else:
-            message += u"Автор: https://vk.com/club" + str(-owner_id)
+            message += u"<b>Автор:</b> https://vk.com/club" + str(-owner_id)
         return message
     else:
         print "There is no new posts in community"
@@ -169,5 +202,5 @@ if __name__ == "__main__":
             broadcast_message(m)
             m = build_message_cycling_wall()
             broadcast_message(m)
-        time.sleep(30)
+        time.sleep(60)
         print "tick"
