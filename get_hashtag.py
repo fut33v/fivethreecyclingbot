@@ -15,7 +15,7 @@ _ALL_POSTS_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'posts'
 _NEWSFEED_SEARCH_URL = "https://api.vk.com/method/newsfeed.search?q=%2353cycling&rev=1&v=5.63&access_token={t}".format(
     t=_TOKEN_VK)
 
-_HASHTAGS = ["53cycling", "novgorodbike"]
+_HASHTAGS = ["53cycling", "novgorodbike", "kayakvn"]
 _53CYCLING_ID = -71413407
 _53CYCLING_DOMAIN = "53cycling"
 
