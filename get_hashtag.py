@@ -202,5 +202,5 @@ if __name__ == "__main__":
             broadcast_message(m)
             m = build_message_cycling_wall()
             broadcast_message(m)
-        time.sleep(60)
+        time.sleep(120)
         print "tick"
