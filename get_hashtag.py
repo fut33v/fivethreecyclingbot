@@ -114,11 +114,15 @@ def build_message(_hashtag):
             return None
         else:
             bot_util.append_string_to_file(_ALL_POSTS_FILENAME, last_item_url + "\n")
-        message += u"Пост: " + last_item_url + "\n"
+        message += u"<b>Пост:</b> " + last_item_url + "\n"
         if owner_id > 0:
-            message += u"Автор: https://vk.com/id" + str(owner_id)
+            user_info = get_user_info(owner_id)
+            first_name = user_info['first_name']
+            last_name = user_info['last_name']
+            message += u"<b>Автор:</b> <a href=\"https://vk.com/id" + str(
+                owner_id) + u"\">" + first_name + u" " + last_name + u"</a>"
         else:
-            message += u"Автор: https://vk.com/club" + str(-owner_id)
+            message += u"<b>Автор:</b> https://vk.com/club" + str(-owner_id)
         return message
     else:
         print "There is no new posts for #" + _hashtag
