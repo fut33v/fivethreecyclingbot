@@ -15,7 +15,7 @@ _ALL_POSTS_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'posts'
 _NEWSFEED_SEARCH_URL = "https://api.vk.com/method/newsfeed.search?q=%2353cycling&rev=1&v=5.63&access_token={t}".format(
     t=_TOKEN_VK)
 
-_HASHTAGS = ["53cycling", "novgorodbike", "kayakvn"]
+_HASHTAGS = ["53cycling", "novgorodbike"]
 _53CYCLING_ID = -71413407
 _53CYCLING_DOMAIN = "53cycling"
 
@@ -201,10 +201,10 @@ def build_message_cycling_wall():
 
 if __name__ == "__main__":
     while True:
+        print "tick"
+        time.sleep(300)
         for h in _HASHTAGS:
             m = build_message(h)
             broadcast_message(m)
             m = build_message_cycling_wall()
             broadcast_message(m)
-        time.sleep(120)
-        print "tick"
