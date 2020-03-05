@@ -75,6 +75,7 @@ def get_user_info(_user_id):
 def build_message(_hashtag):
     url = get_newsfeed_search_hashtag_url(_hashtag)
     response_text = bot_util.urlopen(url)
+
     if not response_text:
         print "Failed to get data from VK"
         return None
@@ -97,6 +98,10 @@ def build_message(_hashtag):
         return None
     if last_item['owner_id'] in _BANNED:
         return None
+
+    print last_item['owner_id']
+    print last_item
+
     last_item_url = build_wall_url(last_item['owner_id'], last_item['id'])
     last_item_filename = _LAST_ITEM_FILENAME + "_" + _hashtag
     last_item_in_file = bot_util.read_one_string_file(last_item_filename)
@@ -222,4 +227,5 @@ if __name__ == "__main__":
             if m is not None:
                 broadcast_message(m)
 
+            broadcast_message(m)
         time.sleep(300)
