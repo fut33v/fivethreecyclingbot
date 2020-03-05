@@ -1,19 +1,28 @@
 # coding=utf-8
 
 import json
-
 import fivethreecyclingbot
 from broadcast import broadcast_message
 from util import bot_util
 import time
+import os
+
 
 _TOKEN_VK_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'token_vk'
 _TOKEN_VK = bot_util.read_one_string_file(_TOKEN_VK_FILENAME)
 _LAST_ITEM_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'last_item'
 _ALL_POSTS_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'posts'
+_BANNED_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'banned'
+
 
 _NEWSFEED_SEARCH_URL = "https://api.vk.com/method/newsfeed.search?q=%2353cycling&rev=1&v=5.63&access_token={t}".format(
     t=_TOKEN_VK)
+
+_BANNED = []
+if os.path.exists(_BANNED_FILENAME):
+    _BANNED = bot_util.read_lines(_BANNED_FILENAME)
+    _BANNED = map(int, _BANNED)
+
 
 _HASHTAGS = ["53cycling", "novgorodbike"]
 _53CYCLING_ID = -71413407
@@ -85,6 +94,8 @@ def build_message(_hashtag):
     last_item = items[0]
     if 'owner_id' not in last_item and 'id' not in last_item:
         print "No 'owner_id' and 'id' in item"
+        return None
+    if last_item['owner_id'] in _BANNED:
         return None
     last_item_url = build_wall_url(last_item['owner_id'], last_item['id'])
     last_item_filename = _LAST_ITEM_FILENAME + "_" + _hashtag
@@ -202,9 +213,13 @@ def build_message_cycling_wall():
 if __name__ == "__main__":
     while True:
         print "tick"
-        time.sleep(300)
         for h in _HASHTAGS:
             m = build_message(h)
-            broadcast_message(m)
+            if m is not None:
+                broadcast_message(m)
+
             m = build_message_cycling_wall()
-            broadcast_message(m)
+            if m is not None:
+                broadcast_message(m)
+
+        time.sleep(300)
