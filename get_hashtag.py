@@ -21,6 +21,9 @@ _NEWSFEED_SEARCH_URL = "https://api.vk.com/method/newsfeed.search?q=%2353cycling
 _BANNED = []
 if os.path.exists(_BANNED_FILENAME):
     _BANNED = bot_util.read_lines(_BANNED_FILENAME)
+    _BANNED = [string.rstrip() for string in _BANNED]
+    _BANNED = [string for string in _BANNED if string]
+    print _BANNED
     _BANNED = map(int, _BANNED)
 
 
