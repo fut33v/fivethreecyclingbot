@@ -14,10 +14,6 @@ _LAST_ITEM_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'last_item'
 _ALL_POSTS_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'posts'
 _BANNED_FILENAME = fivethreecyclingbot.DATA_DIRNAME + 'banned'
 
-
-_NEWSFEED_SEARCH_URL = "https://api.vk.com/method/newsfeed.search?q=%2353cycling&rev=1&v=5.63&access_token={t}".format(
-    t=_TOKEN_VK)
-
 _BANNED = []
 if os.path.exists(_BANNED_FILENAME):
     _BANNED = bot_util.read_lines(_BANNED_FILENAME)
@@ -225,10 +221,7 @@ if __name__ == "__main__":
             m = build_message(h)
             if m is not None:
                 broadcast_message(m)
-
             m = build_message_cycling_wall()
             if m is not None:
                 broadcast_message(m)
-
-            broadcast_message(m)
         time.sleep(300)
